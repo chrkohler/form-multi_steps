@@ -151,12 +151,8 @@
      display: flex;
      justify-content: center;
      gap: var(--space-8);
-     margin: var(--space-8) 0;
+     margin: var(--space-4) 0;
      flex-wrap: wrap;
-   }
-   
-   .list_block_icons li {
-     flex: 0 1 220px;
    }
    
    .icon-opt {

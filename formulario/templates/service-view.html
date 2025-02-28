@@ -36,12 +36,14 @@
                             <!-- Botón PDF -->
                             <button type="button" 
                                     class="btn btn-primary btn-sm" 
+                                    id="downloadPdfBtn" 
                                     @click="handleAction('download')" 
                                     :disabled="loading">
                                 <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
                                 <i v-else class="bi bi-download me-2"></i>
                                 Descargar PDF
                             </button>
+
 
                             <!-- Botón Email -->
                             <!-- <button type="button" 
@@ -748,7 +750,92 @@
             }
         }
     }).mount("#app");
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("customModal");
+
+        if (modal) {
+            modal.classList.add("show");
+            modal.style.display = "flex";
+        } else {
+            console.error("❌ Error: No se encontró el modal con ID 'customModal'.");
+        }
+    });
+
+    function closeCustomModal() {
+        const modal = document.getElementById("customModal");
+        if (modal) {
+            modal.classList.remove("show");
+            setTimeout(() => { modal.style.display = "none"; }, 300);
+        }
+
+        highlightDownloadButton();
+    }
+
+
+
+    function highlightDownloadButton() {
+        const button = document.getElementById("downloadPdfBtn");
+        const modalButton = document.querySelector(".custom-modal-btn");
+
+        if (!button || !modalButton) {
+            console.error("❌ Error: No se encontró uno de los botones.");
+            return;
+        }
+
+        const startRect = modalButton.getBoundingClientRect();
+        const endRect = button.getBoundingClientRect();
+
+        const focusOverlay = document.createElement("div");
+        focusOverlay.classList.add("focus-overlay");
+
+        const tracker = document.createElement("div");
+        tracker.classList.add("tracker");
+        tracker.style.top = `${startRect.top + window.scrollY + startRect.height / 2 - 10}px`;
+        tracker.style.left = `${startRect.left + window.scrollX + startRect.width / 2 - 10}px`;
+
+        document.body.appendChild(focusOverlay);
+        document.body.appendChild(tracker);
+
+        const moveX = endRect.left - startRect.left + (endRect.width / 2 - 10);
+        const moveY = endRect.top - startRect.top + (endRect.height / 2 - 10);
+
+        setTimeout(() => {
+            tracker.style.setProperty("--move-x", `${moveX}px`);
+            tracker.style.setProperty("--move-y", `${moveY}px`);
+            tracker.style.animation = "flip-move 1s ease-in-out forwards";
+        }, 50);
+
+        setTimeout(() => {
+            button.classList.add("pulse-effect");
+        }, 1000);
+
+        setTimeout(() => {
+            focusOverlay.remove();
+            tracker.remove();
+            button.classList.remove("pulse-effect");
+        }, 2000);
+    }
     </script>
+    <!-- Modal -->
+    <div id="customModal" class="custom-modal">
+        <div class="custom-modal-content warning">
+            <button class="custom-modal-close" onclick="closeCustomModal()">&times;</button>
+            <div class="custom-modal-warning-icon">
+                <i class="bi bi-exclamation-triangle-fill"></i> <!-- Icono de Bootstrap -->
+            </div>
+            <h2>¡Atención! No olvides descargar el PDF</h2>
+            <p>
+                Has generado una <strong>vista previa</strong> de la solicitud, pero <strong>NO se ha enviado aún.</strong>  
+                Para guardar una copia, debes descargar el PDF antes de cerrar esta página.  
+                <br><br>
+                <strong>Haz clic en "Descargar PDF" después de cerrar este mensaje.</strong>
+            </p>
+            <button class="custom-modal-btn" onclick="closeCustomModal()">Entendido</button>
+        </div>
+    </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

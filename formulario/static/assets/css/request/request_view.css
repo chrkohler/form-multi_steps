@@ -20,9 +20,70 @@
     width: 100%;
     padding-right: var(--space-4);
     padding-left: var(--space-4);
-    max-width: 1600px;
     margin: 0 auto;
+    
+    max-width: 100%;
+}
+  @media (min-width: 400px) {
+    .container-fluid { max-width: 450px; }
   }
+  @media (min-width: 576px) {
+      .container-fluid { max-width: 540px; }
+  }
+  @media (min-width: 768px) {
+      .container-fluid { max-width: 720px; }
+  }
+  @media (min-width: 992px) {
+      .container-fluid { max-width: 960px; }
+  }
+  @media (min-width: 1200px) {
+      .container-fluid { max-width: 1140px; }
+  }
+  @media (min-width: 1400px) {
+      .container-fluid { max-width: 1320px; }
+  }
+  @media (min-width: 1600px) {
+      .container-fluid { max-width: 1800px; }
+  }
+
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
+[class^="col-"] {
+  padding-left: 8px;
+  padding-right: 8px;
+  flex: 1;
+}
+
+.col-1  { flex: 0 0 calc(100% / 12 * 1);  max-width: calc(100% / 12 * 1);  }
+.col-2  { flex: 0 0 calc(100% / 12 * 2);  max-width: calc(100% / 12 * 2);  }
+.col-3  { flex: 0 0 calc(100% / 12 * 3);  max-width: calc(100% / 12 * 3);  }
+.col-4  { flex: 0 0 calc(100% / 12 * 4);  max-width: calc(100% / 12 * 4);  }
+.col-5  { flex: 0 0 calc(100% / 12 * 5);  max-width: calc(100% / 12 * 5);  }
+.col-6  { flex: 0 0 calc(100% / 12 * 6);  max-width: calc(100% / 12 * 6);  }
+.col-7  { flex: 0 0 calc(100% / 12 * 7);  max-width: calc(100% / 12 * 7);  }
+.col-8  { flex: 0 0 calc(100% / 12 * 8);  max-width: calc(100% / 12 * 8);  }
+.col-9  { flex: 0 0 calc(100% / 12 * 9);  max-width: calc(100% / 12 * 9);  }
+.col-10 { flex: 0 0 calc(100% / 12 * 10); max-width: calc(100% / 12 * 10); }
+.col-11 { flex: 0 0 calc(100% / 12 * 11); max-width: calc(100% / 12 * 11); }
+.col-12 { flex: 0 0 100%; max-width: 100%; }
+
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 16px; }
+.gap-4 { gap: 24px; }
+.gap-5 { gap: 32px; }
+
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.align-center { align-items: center; }
+
   
   /* ==========================================================================
     Componente de tarjeta
@@ -537,3 +598,161 @@
      font-size: var(--text-sm);
     }
   }
+
+
+  /* ==========================================================================
+    Modal
+    ========================================================================== */
+/* Fondo del modal */
+.custom-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+@keyframes pulse-once {
+  0% {
+      transform: scale(0.9);
+      opacity: 0;
+  }
+  100% {
+      transform: scale(1);
+      opacity: 1;
+  }
+}
+
+.custom-modal-warning-icon {
+  font-size: 50px;
+  color: #FFC107;
+  margin-bottom: 10px;
+}
+
+.custom-modal-warning-icon i {
+  font-size: 60px;
+}
+
+.custom-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.custom-modal-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  background: var(--dark-base);
+  color: var(--white);
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.custom-modal-btn:hover {
+  background: var(--surface-color);
+  color: var(--dark-base);
+  border: 1px solid var(--dark-base);
+}
+
+.custom-modal.show .custom-modal-content {
+  animation: pulse-once 0.3s ease-out;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/*FLASH PARA BOTÓN*/
+/* Capa de fondo oscuro con transparencia */
+.focus-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8); /* Fondo oscuro */
+  z-index: 9998;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fade-out 2s forwards;
+}
+
+/* Tracker animado (punto que se mueve) */
+.tracker {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #ffc107; /* Amarillo */
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 193, 7, 1);
+  z-index: 9999;
+  transition: transform 1s ease-in-out; /* Suaviza el movimiento */
+}
+
+/* Pulsación del botón */
+.pulse-effect {
+  animation: pulse 1s ease-in-out 3;
+}
+
+/* Animación de pulsación */
+@keyframes pulse {
+  0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+  }
+  50% {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+  }
+}
+
+/* Desvanecer el fondo */
+@keyframes fade-out {
+  0% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+
+@keyframes flip-move {
+  0% {
+      transform: translate(0, 0) rotate(0);
+  }
+  50% {
+      transform: translate(50px, -50px) rotate(180deg); /* Se levanta un poco y gira */
+  }
+  100% {
+      transform: translate(var(--move-x), var(--move-y)) rotate(360deg); /* Llega girando */
+  }
+}
+
+
