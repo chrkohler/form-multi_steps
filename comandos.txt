@@ -1,0 +1,17 @@
+# 1. Asegúrate de estar en el directorio del proyecto
+cd /mnt/c/form-multi_steps
+
+# 2. Activa el entorno virtual
+source venv/bin/activate
+
+# 3. Verifica que estás usando el Python del entorno virtual
+which python
+
+# 4. Para ejecutar la aplicación
+export FLASK_APP=app.py
+export FLASK_ENV=development
+flask run
+
+
+
+

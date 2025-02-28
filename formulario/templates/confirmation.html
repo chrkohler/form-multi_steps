@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmación de Solicitud</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #F5F7FA;
+            padding: 40px;
+            margin: 0;
+            color: #2C3E50;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            max-width: 600px;
+            margin: 20px auto;
+            border: 1px solid #E5E9F0;
+        }
+
+        h2 {
+            color: #34495E;
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        p {
+            color: #4A5568;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        strong {
+            color: #2C3E50;
+            font-weight: 600;
+        }
+
+        ul {
+            padding: 0;
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        ul li {
+            margin: 10px 0;
+            padding: 12px 15px;
+            background: #F8FAFC;
+            border-radius: 6px;
+            color: #4A5568;
+            font-size: 14px;
+            border: 1px solid #E5E9F0;
+        }
+
+        ul li strong {
+            display: inline-block;
+            min-width: 140px;
+            color: #34495E;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 13px;
+            color: #64748B;
+            text-align: center;
+            border-top: 1px solid #E5E9F0;
+            padding-top: 20px;
+        }
+
+        .footer strong {
+            color: #475569;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .new-request h2 {
+            color: #34495E;
+            border-bottom: 2px solid #E5E9F0;
+            padding-bottom: 15px;
+        }
+
+        .confirmation h2 {
+            color: #34495E;
+            border-bottom: 2px solid #E5E9F0;
+            padding-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container confirmation">
+        <h2>Confirmación de Solicitud Recibida</h2>
+        <p>Estimado/a <strong>[solicitante]</strong>,</p>
+        <p>Hemos recibido su solicitud con los siguientes detalles:</p>
+        <ul>
+            <li><strong>Fecha de Solicitud:</strong> [fecha_solicitud]</li>
+            <li><strong>Nombre del Evento:</strong> [nombre_evento]</li>
+            <li><strong>Ubicación:</strong> [ubicacion]</li>
+            <li><strong>Horario:</strong> [hora_inicio] - [hora_fin] ([fecha_evento])</li>
+            <li><strong>Servicios Principales:</strong> [servicios_principales]</li>
+        </ul>
+        <p>Adjunto encontrará un PDF con toda la información detallada de su solicitud.</p>
+        <div class="footer">
+            Atentamente,<br>
+            <strong>Medialab - Universidad Galileo</strong>
+        </div>
+    </div>
+</body>
+</html>

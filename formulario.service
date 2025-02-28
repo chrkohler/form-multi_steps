@@ -1,0 +1,13 @@
+[Unit]
+Description=Formulario Flask App
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/var/www/formulario
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/var/www/formulario/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:3000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target 

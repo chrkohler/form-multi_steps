@@ -1,0 +1,1 @@
+# Este archivo puede estar vacío ya que movimos la configuración a app.py 

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es" x-data="mainApp()" xmlns:x-transition="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Formulario de Servicios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg_style_4">
+    <div class="container-fluid my-5">
+        <div id="wizard_container">
+                        <form id="serviceForm" class="needs-validation" method="POST" action="{{ url_for('main.submit_form') }}" novalidate x-data>
+                            <!-- Campos ocultos para los servicios -->
+                            <input type="hidden" name="selectedMainServices" :value="JSON.stringify($data.selectedMainServices)">
+                            <input type="hidden" name="selectedSubServices" :value="JSON.stringify($data.selectedSubServices)">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <!-- Paso 1: Tipo de Actividad -->
+                            <div class="step" x-show="step === 1">
+                                <h3>Tipo de Actividad</h3>
+                                <p class="mb-3 alert alert-info" x-show="!isRecurrent">
+                                    <strong>Actividad Única:</strong> Esta opción es para eventos que ocurren una sola vez.
+                                </p>
+                                <p class="mb-3 alert alert-warning" x-show="isRecurrent">
+                                    <strong>Actividad Recurrente:</strong> Esta opción es para eventos que se repiten regularmente.
+                                </p>
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-10 col-md-10">
+                                        <div class="list_block_icons">
+                                            <ul>
+                                                <li>
+                                                    <div class="mb-3">
+                                                        <div class="item form-group mb-0 text-center activity-sel">
+                                                            <input class="form-check-input" 
+                                                                   type="radio" 
+                                                                   name="product_opt" 
+                                                                   id="single" 
+                                                                   value="unica" 
+                                                                   @click="() => { 
+                                                                       isRecurrent = false; 
+                                                                       product_opt = 'unica';
+                                                                       console.log('Seleccionada actividad única:', {isRecurrent, product_opt});
+                                                                   }"
+                                                                   :checked="!isRecurrent">
+                                                            <label for="single">
+                                                                <i class="fas fa-calendar-day icon-opt d-block" style="font-size: 32px; padding-bottom: 10px;"></i>
+                                                                Actividad Única
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="mb-3">
+                                                        <div class="item form-group mb-0 text-center activity-sel">
+                                                            <input class="form-check-input" 
+                                                                   type="radio" 
+                                                                   name="product_opt" 
+                                                                   id="recurrent" 
+                                                                   value="recurrente" 
+                                                                   @click="() => { 
+                                                                       isRecurrent = true; 
+                                                                       product_opt = 'recurrente';
+                                                                       console.log('Seleccionada actividad recurrente:', {isRecurrent, product_opt});
+                                                                   }"
+                                                                   :checked="isRecurrent">
+                                                            <label for="recurrent">
+                                                                <i class="fas fa-calendar-alt icon-opt d-block" style="font-size: 32px; padding-bottom: 10px;"></i>
+                                                                Actividad Recurrente
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Paso 2: Servicios -->
+                            <div class="step" x-show="step === 2">
+                                <h3>Selección de Servicios</h3>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="sidebar">
+                                            <div class="mb-3" x-show="isRecurrent">
+                                                <label class="form-label"><strong>Plantillas de Servicios</strong></label>
+                                                <select x-model="selectedTemplate" @change="applyTemplate(selectedTemplate)" class="form-control">
+                                                    <option value="predeterminado">🔹 Predeterminado</option>
+                                                    <option value="cursos">📚 Cursos con Uso de Estudio</option>
+                                                    <option value="cursos_u">🏛️ Cursos en Universidad</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3" x-show="!isRecurrent">
+                                                <label class="form-label"><strong>Plantillas Preestablecidas</strong></label>
+                                                <select x-model="selectedTemplate" @change="applyTemplate(selectedTemplate)" class="form-control">
+                                                    <option value="predeterminado">🔹 Predeterminado</option>
+                                                    <option value="transmision">📡 Transmisión en Vivo</option>
+                                                    <option value="falsovivo">🎬 Falso en Vivo</option>
+                                                    <option value="evento_presencial">🎤 Evento Presencial</option>
+                                                    <option value="webinar">💻 Webinar</option>
+                                                </select>
+                                            </div>
+                                            <hr class="my-4">
+                                            <div class="mb-4">
+                                                <h5>Servicios Principales</h5>
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <template x-for="mainService in mainServices" :key="mainService">
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input" 
+                                                                       type="checkbox" 
+                                                                       :id="mainService"
+                                                                       :value="mainService"
+                                                                       @click="toggleMainService(mainService)"
+                                                                       :checked="selectedMainServices.includes(mainService)">
+                                                                <label class="form-check-label" 
+                                                                       :for="mainService" 
+                                                                       x-text="mainService"></label>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="authorization-section mb-3 alert alert-warning">
+                                                <h5>Autorización Web <span class="text-danger">*</span></h5>
+                                                <div class="form-check">
+                                                    <input type="radio" 
+                                                           name="authorization" 
+                                                           id="auth1" 
+                                                           value="Autorizado para publicacion"
+                                                           x-model="selectedAuthorization">
+                                                    <label class="form-check-label" for="auth1">Autorizado para publicación</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="radio" 
+                                                           name="authorization" 
+                                                           id="auth2" 
+                                                           value="No autorizado para publicacion"
+                                                           x-model="selectedAuthorization">
+                                                    <label class="form-check-label" for="auth2">No autorizado para publicación</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5>Servicios Adicionales</h5>
+                                                <template x-for="mainService in selectedMainServices" :key="mainService">
+                                                    <div class="mb-4" x-show="subServiceOptions[mainService]">
+                                                        <h6 class="text-primary" x-text="mainService"></h6>
+                                                        <div class="ms-3">
+                                                            <template x-for="subService in subServiceOptions[mainService]" :key="subService">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" 
+                                                                           type="checkbox" 
+                                                                           :id="'sub-' + subService"
+                                                                           :value="subService"
+                                                                           @click="toggleSubService(subService, mainService)"
+                                                                           :checked="selectedSubServices.includes(subService)">
+                                                                    <label class="form-check-label" 
+                                                                           :for="'sub-' + subService" 
+                                                                           x-text="subService"></label>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Paso 3: Detalles de la Actividad -->
+                            <div class="step" x-show="step === 3">
+                                <h3>Detalles de la Actividad</h3>
+                                
+                                <!-- Alerta informativa del tipo de actividad -->
+                                <p class="mb-3 alert alert-info" x-show="!isRecurrent">
+                                    <strong>Actividad Única:</strong> Complete los detalles para un evento único.
+                                </p>
+                                <p class="mb-3 alert alert-warning" x-show="isRecurrent">
+                                    <strong>Actividad Recurrente:</strong> Complete los detalles para un evento recurrente.
+                                    <span x-text="'Tipo: ' + recurrenceType"></span>
+                                </p>
+
+                                <!-- Campos comunes para ambos tipos -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="activity_name" class="form-label">Nombre del Evento<span class="text-danger">*</span></label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="activity_name" 
+                                                   name="activity_name" 
+                                                   x-model="activity_name"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="activity_location" class="form-label">Ubicación del Evento<span class="text-danger">*</span></label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="activity_location" 
+                                                   name="activity_location" 
+                                                   x-model="activity_location"
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Campos específicos para actividad única -->
+                                <div x-show="!isRecurrent" class="row mb-4">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="activity_date" class="form-label">Fecha<span class="text-danger">*</span></label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="activity_date" 
+                                                   name="activity_date" 
+                                                   x-model="activity_date"
+                                                   x-bind:required="!isRecurrent">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="start" class="form-label">Hora de Inicio<span class="text-danger">*</span></label>
+                                            <input type="time" 
+                                                   class="form-control" 
+                                                   id="start" 
+                                                   name="start" 
+                                                   x-model="start"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="end" class="form-label">Hora de Fin<span class="text-danger">*</span></label>
+                                            <input type="time" 
+                                                   class="form-control" 
+                                                   id="end" 
+                                                   name="end" 
+                                                   x-model="end"
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Campos específicos para actividad recurrente -->
+                                <div x-show="isRecurrent" class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="start_date" class="form-label">Fecha de Inicio<span class="text-danger">*</span></label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="start_date" 
+                                                   name="start_date" 
+                                                   x-model="start_date"
+                                                   x-bind:required="isRecurrent">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="end_date" class="form-label">Fecha de Fin<span class="text-danger">*</span></label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="end_date" 
+                                                   name="end_date" 
+                                                   x-model="end_date"
+                                                   x-bind:required="isRecurrent">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="start" class="form-label">Hora de Inicio<span class="text-danger">*</span></label>
+                                            <input type="time" 
+                                                   class="form-control" 
+                                                   id="start" 
+                                                   name="start" 
+                                                   x-model="start"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="end" class="form-label">Hora de Fin<span class="text-danger">*</span></label>
+                                            <input type="time" 
+                                                   class="form-control" 
+                                                   id="end" 
+                                                   name="end" 
+                                                   x-model="end"
+                                                   required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tipos de recurrencia -->
+                                    <div x-show="isRecurrent" class="mt-4">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label class="form-label"><strong>Tipo de Recurrencia</strong></label>
+                                                <div class="btn-group w-100" role="group">
+                                                    <input type="radio" 
+                                                           class="btn-check" 
+                                                           name="recurrenceType" 
+                                                           id="diario" 
+                                                           value="diario" 
+                                                           x-model="recurrenceType">
+                                                    <label class="btn btn-outline-primary" for="diario">
+                                                        <i class="bi bi-calendar-day me-2"></i>
+                                                        Diario
+                                                    </label>
+
+                                                    <input type="radio" 
+                                                           class="btn-check" 
+                                                           name="recurrenceType" 
+                                                           id="semanal" 
+                                                           value="semanal" 
+                                                           x-model="recurrenceType">
+                                                    <label class="btn btn-outline-primary" for="semanal">
+                                                        <i class="bi bi-calendar-week me-2"></i>
+                                                        Semanal
+                                                    </label>
+
+                                                    <input type="radio" 
+                                                           class="btn-check" 
+                                                           name="recurrenceType" 
+                                                           id="mensual" 
+                                                           value="mensual" 
+                                                           x-model="recurrenceType">
+                                                    <label class="btn btn-outline-primary" for="mensual">
+                                                        <i class="bi bi-calendar-month me-2"></i>
+                                                        Mensual
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Controles para recurrencia SEMANAL -->
+                                        <div x-show="recurrenceType === 'semanal'" class="mt-4">
+                                            <label class="form-label"><strong>Seleccione los días de la semana</strong></label>
+                                            <div class="weekdays-container">
+                                                <template x-for="day in weekdays" :key="day.value">
+                                                    <div class="weekday-btn">
+                                                        <input type="checkbox" 
+                                                               class="btn-check" 
+                                                               :id="day.value" 
+                                                               :checked="day.checked"
+                                                               @click="toggleWeekday(day)">
+                                                        <label class="btn btn-outline-primary" 
+                                                               :class="{ 'active': day.checked }"
+                                                               :for="day.value" 
+                                                               x-text="day.name">
+                                                    </label>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <!-- Controles para recurrencia MENSUAL -->
+                                        <div x-show="recurrenceType === 'mensual'" class="mt-4">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><strong>Semana del mes</strong></label>
+                                                    <select class="form-select" x-model="monthWeek">
+                                                        <option value="primera">Primera semana</option>
+                                                        <option value="segunda">Segunda semana</option>
+                                                        <option value="tercera">Tercera semana</option>
+                                                        <option value="cuarta">Cuarta semana</option>
+                                                        <option value="ultima">Última semana</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><strong>Día de la semana</strong></label>
+                                                    <select class="form-select" x-model="selectedMonthDay">
+                                                        <template x-for="day in weekdays" :key="day.value">
+                                                            <option :value="day.value" x-text="day.name"></option>
+                                                        </template>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="observations" class="form-label">Observaciones Adicionales</label>
+                                            <textarea class="form-control" 
+                                                      id="observations" 
+                                                      name="observations" 
+                                                      rows="3"
+                                                      x-model="observations"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Paso 4: Información del Solicitante -->
+                            <div class="step" x-show="step === 4">
+                                <h3>Información del Solicitante</h3>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="request_date" class="form-label">Fecha de Solicitud</label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="request_date" 
+                                                   name="request_date" 
+                                                   value="{{ form_data.request_date }}" 
+                                                   readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="department" class="form-label">Departamento</label>
+                                            <input type="text" class="form-control" id="department" name="department" 
+                                                   required x-model="department">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="applicant" class="form-label">Solicitante</label>
+                                            <input type="text" class="form-control" id="applicant" name="applicant" 
+                                                   required x-model="applicant">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   required x-model="email">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="contact" class="form-label">Teléfono de Contacto</label>
+                                            <input type="tel" class="form-control" id="contact" name="contact" 
+                                                   required x-model="contact">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navegación entre pasos -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-secondary" @click="prevStep()" x-show="step > 1">Anterior</button>
+                                <button type="button" class="btn btn-primary" @click="nextStep()" x-show="step < totalSteps">Siguiente</button>
+                                <button type="button" 
+                                        class="btn btn-success" 
+                                        @click="submitForm" 
+                                        x-show="step === totalSteps">
+                                    Enviar
+                                </button>
+                            </div>
+
+                            <!-- Indicador de pasos -->
+                            <div class="step-indicator mt-4">
+                                <template x-for="index in totalSteps" :key="index">
+                                    <span class="step-dot" :class="{ 'active': step >= index }"></span>
+                                </template>
+                            </div>
+
+                            <!-- Agregar al inicio del formulario -->
+                            <div class="alert alert-info" x-show="localStorage.getItem('formData')" role="alert">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-info-circle-fill me-2"></i>
+                                        Se ha encontrado un formulario sin completar. ¿Desea restaurarlo?
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-primary btn-sm me-2" 
+                                                @click.prevent="restoreFormData(JSON.parse(localStorage.getItem('formData')))">
+                                            Restaurar
+                                        </button>
+                                        <button type="button" class="btn btn-secondary btn-sm" 
+                                                @click.prevent="clearSavedData()">
+                                            Descartar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Agregar justo después del div de restauración -->
+                            <div x-show="isSaving" 
+                                 class="alert alert-success alert-dismissible fade show position-fixed bottom-0 end-0 m-3" 
+                                 role="alert" 
+                                 style="z-index: 1050;">
+                                <i class="bi bi-cloud-arrow-up-fill me-2"></i>
+                                Guardando cambios...
+                                <button type="button" class="btn-close" @click="isSaving = false"></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Toast de notificación -->
+    <!-- <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Medialab</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Enviando solicitud, por favor espere...
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Modal de Confirmación -->
+    <!-- <div class="modal fade" id="confirmationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4 text-center bg-white">
+                <i class="bi bi-check-circle-fill success-icon animate__animated animate__bounceIn" style="color: #198754; font-size: 80px;"></i>
+                <h2 class="mt-3 text-dark fw-bold">¡Gracias!</h2>
+                <p class="lead text-dark">Tu solicitud ha sido procesada exitosamente</p>
+                <div class="email-info p-3 rounded shadow-sm" style="background-color: #f8f9fa;">
+                    <h5 class="text-dark fw-bold mb-3">El PDF ha sido generado</h5>
+                    <p class="text-dark mb-3">Enviar el Correo a las siguientes direcciones:</p>
+                    <p class="mb-2 text-dark">
+                        <i class="bi bi-envelope text-primary"></i>
+                        <strong class="ms-2">medialab@galileo.edu</strong>
+                    </p>
+                    <p class="text-dark">
+                        <i class="bi bi-envelope text-primary"></i>
+                        <strong class="ms-2">dantonio@galileo.edu</strong> <span class="text-muted">cc</span>
+                    </p>
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Cerrar
+                    </button>
+                    <a class="btn btn-primary btn-lg fw-bold" href="#">
+                        <i class="bi bi-house-fill me-2"></i>Ver Solicitud
+                    </a>
+                    <a class="btn btn-primary btn-lg fw-bold" href="https://medialab.galileo.edu/servicios">
+                        <i class="bi bi-house-fill me-2"></i>Volver al Inicio
+                    </a>
+                </div>
+                <p class="mt-4 text-muted">Si tienes alguna pregunta, no dudes en contactarnos</p>
+            </div>
+        </div>
+    </div -->>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/js/mainApp.js') }}"></script>
+
+    <!-- Estilos adicionales -->
+    <style>
+    .weekdays-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+    }
+
+    .weekday-btn .btn {
+        min-width: 130px;
+        margin: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .weekday-btn .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .weekday-btn .btn.active {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+
+    @media (max-width: 768px) {
+        .weekday-btn .btn {
+            min-width: 110px;
+            font-size: 0.9rem;
+        }
+    }
+    </style>
+</body>
+</html>
